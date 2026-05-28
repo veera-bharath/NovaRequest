@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "API Quick Tester",
+  "name": "NovaRequest",
   "version": "1.0.0",
   "description": "A lightweight, rapid developer API testing workbench. Run HTTP requests (GET, POST, PUT, DELETE), manage custom headers, dynamically validate JSON bodies, and save/reload API templates locally.",
   "permissions": [
@@ -11,7 +11,7 @@
   ],
   "action": {
     "default_popup": "index.html",
-    "default_title": "API Quick Tester"
+    "default_title": "NovaRequest"
   },
   "background": {
     "service_worker": "background.js",

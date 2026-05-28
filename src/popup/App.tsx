@@ -86,7 +86,7 @@ export const App: React.FC = () => {
               ? 'bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent' 
               : 'text-zinc-800'
           }`}>
-            API Quick Tester
+            NovaRequest
           </span>
           <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border transition-all duration-200 ${
             isDarkMode 
