@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+/* Custom Scrollbar Styles for elegant devtools layout */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(63, 63, 70, 0.6);
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(161, 161, 170, 0.6);
+}
+
+/* Custom Micro-Utilities for High Density Interfaces */
+.text-2xs {
+  font-size: 11px;
+}
+
+.text-3xs {
+  font-size: 10px;
+}
+
+.text-4xs {
+  font-size: 9px;
+}
+
+.h-7\.5 {
+  height: 30px;
+}
+
+.w-5\.5 {
+  width: 22px;
+}
+
+.h-5\.5 {
+  height: 22px;
+}
+
+.pl-7\.5 {
+  padding-left: 30px;
+}
+
+.text-rose-450 {
+  color: #f43f5e;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+body {
+  background-color: #0b0f17;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
