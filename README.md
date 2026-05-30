@@ -30,8 +30,12 @@ NovaRequest is a lightweight, rapid developer API testing workbench built direct
   * Instant search query bar: filter saved templates by Name, HTTP method, or URL segment.
   * Load-to-edit action: clicking any template imports its exact request parameters instantly and resets the workbench sheet.
 
+* **🛠️ Advanced Developer Utilities**:
+  * **Copy cURL**: Header bar features a quick "Copy Workbench Config as cURL" button to immediately copy your current request state as a standard cURL command with immediate success checkmark animation.
+  * **Send Options**: Chevron Down split dropdown button enables copying as cURL or triggering *"Send & Download JSON"* to execute the request and download the response payload directly as a formatted JSON file.
+
 * **🌗 Persisted Dark & Light Themes**:
-  * Seamless visual transition between high-fidelity Navy Dark (`#0b0f17`) and Zinc Light (`#f4f6f9`) modes.
+  * Seamless visual transition between Chrome-like Charcoal Dark (`#1e1e1e`) and clean Zinc Light (`#f3f3f3`) modes, featuring a pure monochrome color scheme without noisy accent colors.
   * Selection state is written to **Chrome's storage database** to remember your theme selection across browser sessions.
 
 ---
@@ -56,6 +60,8 @@ NovaRequest/
 ├── src/
 │   ├── api/
 │   │   └── httpClient.ts        # Axios network core & stats tracker
+│   ├── assets/
+│   │   └── novarequest.png      # Extension brand logo
 │   ├── background/
 │   │   └── serviceWorker.ts     # Extension network request broker
 │   ├── popup/
