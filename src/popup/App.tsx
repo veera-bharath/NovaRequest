@@ -76,11 +76,7 @@ export const App: React.FC = () => {
 
         {/* Left Brand info */}
         <div className="flex items-center gap-2">
-          <div className="w-5.5 h-5.5 rounded-lg bg-violet-600/20 flex items-center justify-center border border-violet-500/30">
-            <svg className="w-3.5 h-3.5 text-violet-400 fill-violet-400" viewBox="0 0 24 24">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-          </div>
+          <img src="/icon.png" className="w-5.5 h-5.5 rounded-md border border-zinc-800/40 object-cover select-none pointer-events-none" alt="NovaRequest Logo" />
           <span className={`text-xs font-bold tracking-wider uppercase font-mono transition-all ${
             isDarkMode 
               ? 'bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent' 
