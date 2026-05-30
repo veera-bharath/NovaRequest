@@ -7,19 +7,42 @@ import { SavedRequests } from './components/SavedRequests';
 import { ParamsEditor } from './components/ParamsEditor';
 import { AuthEditor } from './components/AuthEditor';
 import { useRequestStore } from '../store/useRequestStore';
-import { Sun, Moon, Copy, Settings, Layers, FolderHeart, History, Folder, Database, Sliders } from 'lucide-react';
+import { Sun, Moon, Copy, Settings, Layers, FolderHeart, History, Folder, Database, Sliders, Check } from 'lucide-react';
+import logoIcon from '../assets/novarequest.png';
 
 export const App: React.FC = () => {
   const { 
     headers, 
     body, 
     method, 
+    url,
     savedRequests, 
     resetRequestForm,
     isDarkMode,
     toggleDarkMode,
     loadTheme
   } = useRequestStore();
+
+  const [copiedConfig, setCopiedConfig] = useState(false);
+
+  const handleCopyWorkbenchConfig = () => {
+    let curl = `curl -X ${method} "${url || 'https://'}"`;
+    
+    headers.forEach((h) => {
+      if (h.enabled && h.key.trim()) {
+        curl += ` -H "${h.key.trim()}: ${h.value}"`;
+      }
+    });
+    
+    if (body.trim() && (method === 'POST' || method === 'PUT' || method === 'DELETE')) {
+      const escapedBody = body.replace(/"/g, '\\"').replace(/\n/g, '');
+      curl += ` -d "${escapedBody}"`;
+    }
+    
+    navigator.clipboard.writeText(curl);
+    setCopiedConfig(true);
+    setTimeout(() => setCopiedConfig(false), 2000);
+  };
 
   // Navigation states
   const [activeBottomTab, setActiveBottomTab] = useState<'request' | 'collections' | 'environments' | 'settings'>('request');
@@ -69,14 +92,11 @@ export const App: React.FC = () => {
       <header className={`flex-shrink-0 flex items-center justify-between px-3.5 py-3 border-b relative select-none transition-all duration-200 ${
         isDarkMode ? 'bg-zinc-900 border-zinc-800/80' : 'bg-zinc-200/50 border-zinc-300'
       }`}>
-        {/* Glow Line decoration (Only in dark mode) */}
-        {isDarkMode && (
-          <div className="absolute bottom-0 left-0 right-0 h-[0.5px] bg-gradient-to-r from-transparent via-violet-500/40 to-transparent"></div>
-        )}
+
 
         {/* Left Brand info */}
         <div className="flex items-center gap-2">
-          <img src="/icon.png" className="w-5.5 h-5.5 rounded-md border border-zinc-800/40 object-cover select-none pointer-events-none" alt="NovaRequest Logo" />
+          <img src={logoIcon} className="w-5.5 h-5.5 rounded-md object-cover select-none pointer-events-none" alt="NovaRequest Logo" />
           <span className={`text-xs font-bold tracking-wider uppercase font-mono transition-all ${
             isDarkMode 
               ? 'bg-gradient-to-r from-zinc-100 to-zinc-400 bg-clip-text text-transparent' 
@@ -112,14 +132,19 @@ export const App: React.FC = () => {
           {/* Copy Workbench */}
           <button
             type="button"
+            onClick={handleCopyWorkbenchConfig}
             className={`p-1.5 rounded-lg border transition-all duration-200 ${
               isDarkMode 
                 ? 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200' 
                 : 'bg-zinc-100 border-zinc-300 text-zinc-650 hover:text-zinc-800 hover:bg-zinc-200'
             }`}
-            title="Copy Workbench Config"
+            title="Copy Workbench Config as cURL"
           >
-            <Copy className="w-3.5 h-3.5" />
+            {copiedConfig ? (
+              <Check className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+            ) : (
+              <Copy className="w-3.5 h-3.5" />
+            )}
           </button>
 
           {/* Settings */}
@@ -128,7 +153,9 @@ export const App: React.FC = () => {
             onClick={() => setActiveBottomTab('settings')}
             className={`p-1.5 rounded-lg border transition-all duration-200 ${
               activeBottomTab === 'settings'
-                ? 'bg-violet-950/20 border-violet-900 text-violet-400'
+                ? isDarkMode
+                  ? 'bg-zinc-800 border-zinc-700 text-zinc-100'
+                  : 'bg-zinc-200 border-zinc-300 text-zinc-950 font-bold'
                 : isDarkMode 
                   ? 'bg-zinc-900/60 border-zinc-800 text-zinc-400 hover:text-zinc-200' 
                   : 'bg-zinc-100 border-zinc-300 text-zinc-650 hover:text-zinc-800 hover:bg-zinc-200'
@@ -160,7 +187,7 @@ export const App: React.FC = () => {
               >
                 <span>Params</span>
                 {activeRequestTab === 'params' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500 rounded-full animate-fadeIn"></div>
+                  <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full animate-fadeIn ${isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'}`}></div>
                 )}
               </button>
 
@@ -174,14 +201,16 @@ export const App: React.FC = () => {
                 {activeHeadersCount > 0 && (
                   <span className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold transition-all ${
                     activeRequestTab === 'headers' 
-                      ? 'bg-violet-950/60 text-violet-400 border border-violet-900/30' 
+                      ? isDarkMode
+                        ? 'bg-zinc-800 text-zinc-200 border border-zinc-700'
+                        : 'bg-zinc-200 text-zinc-800 border border-zinc-300'
                       : (isDarkMode ? 'bg-zinc-950 text-zinc-650' : 'bg-zinc-200 text-zinc-500')
                   }`}>
                     {activeHeadersCount}
                   </span>
                 )}
                 {activeRequestTab === 'headers' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500 rounded-full animate-fadeIn"></div>
+                  <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full animate-fadeIn ${isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'}`}></div>
                 )}
               </button>
 
@@ -193,10 +222,10 @@ export const App: React.FC = () => {
               >
                 <span>Body</span>
                 {hasBodyContent && (
-                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <div className={`w-1.5 h-1.5 rounded-full animate-pulse ${isDarkMode ? 'bg-zinc-400' : 'bg-zinc-500'}`}></div>
                 )}
                 {activeRequestTab === 'body' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500 rounded-full animate-fadeIn"></div>
+                  <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full animate-fadeIn ${isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'}`}></div>
                 )}
               </button>
 
@@ -208,7 +237,7 @@ export const App: React.FC = () => {
               >
                 <span>Auth</span>
                 {activeRequestTab === 'auth' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500 rounded-full animate-fadeIn"></div>
+                  <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full animate-fadeIn ${isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'}`}></div>
                 )}
               </button>
 
@@ -220,7 +249,7 @@ export const App: React.FC = () => {
               >
                 <span>Scripts</span>
                 {activeRequestTab === 'scripts' && (
-                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-violet-500 rounded-full animate-fadeIn"></div>
+                  <div className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full animate-fadeIn ${isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'}`}></div>
                 )}
               </button>
             </div>
@@ -265,7 +294,7 @@ export const App: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wider font-mono">
-                  <FolderHeart className="w-3.5 h-3.5 text-violet-400" />
+                  <FolderHeart className={`w-3.5 h-3.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`} />
                   <span>Request Library</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[9.5px] font-semibold text-zinc-500">
@@ -294,12 +323,12 @@ export const App: React.FC = () => {
         {/* TAB WORKBENCH: ENVIRONMENTS */}
         {activeBottomTab === 'environments' && (
           <div className="flex flex-col gap-4 items-center justify-center p-6 text-center select-none h-full max-w-[260px] mx-auto animate-fadeIn">
-            <Layers className="w-8 h-8 text-violet-500/50" />
+            <Layers className={`w-8 h-8 ${isDarkMode ? 'text-zinc-400/40' : 'text-zinc-650/40'}`} />
             <span className="text-zinc-500 font-mono text-[9px] uppercase tracking-wider">
               Environment Variables
             </span>
             <p className="text-[10px] text-zinc-555 leading-relaxed">
-              Inject environment keys like <code className="text-violet-450 bg-zinc-900/50 px-1 py-0.5 rounded text-[9px]">&#123;&#123;base_url&#125;&#125;</code> dynamically into URLs and headers. Coming soon.
+              Inject environment keys like <code className={`px-1 py-0.5 rounded text-[9px] ${isDarkMode ? 'text-zinc-300 bg-zinc-900/50' : 'text-zinc-700 bg-zinc-200/50'}`}>&#123;&#123;base_url&#125;&#125;</code> dynamically into URLs and headers. Coming soon.
             </p>
           </div>
         )}
@@ -372,8 +401,8 @@ export const App: React.FC = () => {
           }}
           className={`flex flex-col items-center gap-0.5 transition-all relative group py-1.5 px-3.5 rounded-lg ${
             activeBottomTab === 'request' 
-              ? 'text-violet-400 bg-violet-950/15' 
-              : (isDarkMode ? 'text-zinc-650 hover:text-zinc-400' : 'text-zinc-500 hover:text-zinc-700')
+              ? isDarkMode ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-950 bg-zinc-200 font-bold'
+              : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-750')
           }`}
         >
           <svg className="w-4 h-4 fill-current text-current" viewBox="0 0 24 24">
@@ -388,8 +417,8 @@ export const App: React.FC = () => {
           onClick={() => setActiveBottomTab('collections')}
           className={`flex flex-col items-center gap-0.5 transition-all py-1.5 px-3.5 rounded-lg ${
             activeBottomTab === 'collections' 
-              ? 'text-violet-400 bg-violet-950/15' 
-              : (isDarkMode ? 'text-zinc-650 hover:text-zinc-400' : 'text-zinc-500 hover:text-zinc-700')
+              ? isDarkMode ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-950 bg-zinc-200 font-bold'
+              : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-750')
           }`}
         >
           <Folder className="w-4 h-4" />
@@ -402,8 +431,8 @@ export const App: React.FC = () => {
           onClick={() => setActiveBottomTab('environments')}
           className={`flex flex-col items-center gap-0.5 transition-all py-1.5 px-3.5 rounded-lg ${
             activeBottomTab === 'environments' 
-              ? 'text-violet-400 bg-violet-950/15' 
-              : (isDarkMode ? 'text-zinc-650 hover:text-zinc-400' : 'text-zinc-500 hover:text-zinc-700')
+              ? isDarkMode ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-950 bg-zinc-200 font-bold'
+              : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-750')
           }`}
         >
           <Layers className="w-4 h-4" />
@@ -416,8 +445,8 @@ export const App: React.FC = () => {
           onClick={() => setActiveBottomTab('settings')}
           className={`flex flex-col items-center gap-0.5 transition-all py-1.5 px-3.5 rounded-lg ${
             activeBottomTab === 'settings' 
-              ? 'text-violet-400 bg-violet-950/15' 
-              : (isDarkMode ? 'text-zinc-650 hover:text-zinc-400' : 'text-zinc-500 hover:text-zinc-700')
+              ? isDarkMode ? 'text-zinc-100 bg-zinc-800' : 'text-zinc-950 bg-zinc-200 font-bold'
+              : (isDarkMode ? 'text-zinc-500 hover:text-zinc-300' : 'text-zinc-500 hover:text-zinc-750')
           }`}
         >
           <Sliders className="w-4 h-4 rotate-90" />

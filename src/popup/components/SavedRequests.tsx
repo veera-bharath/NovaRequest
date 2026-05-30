@@ -4,7 +4,7 @@ import type { SavedRequest } from '../../types/request';
 import { Search, FolderHeart, Trash2, Link, Calendar } from 'lucide-react';
 
 export const SavedRequests: React.FC = () => {
-  const { savedRequests, loadSavedRequests, loadRequest, deleteRequest, activeSavedRequestId } =
+  const { savedRequests, loadSavedRequests, loadRequest, deleteRequest, activeSavedRequestId, isDarkMode } =
     useRequestStore();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -15,15 +15,20 @@ export const SavedRequests: React.FC = () => {
   }, []);
 
   const getMethodBadgeClass = (m: SavedRequest['method']) => {
-    switch (m) {
-      case 'GET':
-        return 'text-emerald-400 bg-emerald-950/50 border border-emerald-900/30';
-      case 'POST':
-        return 'text-sky-400 bg-sky-950/50 border border-sky-900/30';
-      case 'PUT':
-        return 'text-amber-400 bg-amber-950/50 border border-amber-900/30';
-      case 'DELETE':
-        return 'text-rose-400 bg-rose-950/50 border border-rose-900/30';
+    if (isDarkMode) {
+      switch (m) {
+        case 'GET': return 'text-emerald-450 bg-emerald-950/20 border border-emerald-900/20';
+        case 'POST': return 'text-sky-400 bg-sky-950/20 border border-sky-900/20';
+        case 'PUT': return 'text-amber-400 bg-amber-950/20 border border-amber-900/20';
+        case 'DELETE': return 'text-rose-455 bg-rose-955/20 border border-rose-900/20';
+      }
+    } else {
+      switch (m) {
+        case 'GET': return 'text-emerald-600 bg-emerald-50 border border-emerald-200';
+        case 'POST': return 'text-sky-600 bg-sky-50 border border-sky-200';
+        case 'PUT': return 'text-amber-600 bg-amber-50 border border-amber-200';
+        case 'DELETE': return 'text-rose-600 bg-rose-50 border border-rose-200';
+      }
     }
   };
 
@@ -50,10 +55,12 @@ export const SavedRequests: React.FC = () => {
   );
 
   return (
-    <div className="flex flex-col gap-2.5 bg-zinc-900 border border-zinc-800 p-3 rounded-xl shadow-lg shrink-0">
-      <div className="flex items-center justify-between border-b border-zinc-850 pb-2">
+    <div className={`flex flex-col gap-2.5 border p-3 rounded-xl shadow-lg shrink-0 transition-colors ${
+      isDarkMode ? 'bg-zinc-900 border-zinc-800 text-zinc-300' : 'bg-zinc-50 border-zinc-300 text-zinc-800'
+    }`}>
+      <div className={`flex items-center justify-between border-b pb-2 ${isDarkMode ? 'border-zinc-850' : 'border-zinc-300'}`}>
         <span className="text-2xs font-bold uppercase tracking-wider text-zinc-400 font-mono flex items-center gap-1.5 select-none">
-          <FolderHeart className="w-3.5 h-3.5 text-violet-400" />
+          <FolderHeart className={`w-3.5 h-3.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-650'}`} />
           <span>Saved Requests ({savedRequests.length})</span>
         </span>
       </div>
@@ -66,9 +73,13 @@ export const SavedRequests: React.FC = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Search by name, method, or URL..."
-            className="w-full h-7 pl-7.5 pr-2 bg-zinc-950 border border-zinc-850 rounded text-3xs text-zinc-300 placeholder-zinc-700 focus:border-violet-500/50 focus:outline-none transition-all font-sans"
+            className={`w-full h-7 pl-7.5 pr-2 border rounded text-3xs transition-all font-sans focus:outline-none focus:border-zinc-500 ${
+              isDarkMode 
+                ? 'bg-zinc-950 border-zinc-850 text-zinc-300 placeholder-zinc-700' 
+                : 'bg-white border-zinc-300 text-zinc-800 placeholder-zinc-400'
+            }`}
           />
-          <Search className="w-3.5 h-3.5 text-zinc-700 absolute left-2.5 top-1.5 pointer-events-none" />
+          <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-2.5 top-1.5 pointer-events-none" />
         </div>
       )}
 
@@ -83,8 +94,12 @@ export const SavedRequests: React.FC = () => {
                 onClick={() => loadRequest(req)}
                 className={`group flex items-stretch gap-2.5 p-2 rounded-lg border cursor-pointer transition-all duration-150 relative ${
                   isActive
-                    ? 'bg-violet-950/15 border-violet-900 text-zinc-100'
-                    : 'bg-zinc-950/40 border-zinc-850 text-zinc-350 hover:bg-zinc-850/30 hover:border-zinc-800'
+                    ? isDarkMode 
+                      ? 'bg-zinc-800 border-zinc-700 text-zinc-100'
+                      : 'bg-zinc-200 border-zinc-300 text-zinc-950 font-bold'
+                    : isDarkMode
+                      ? 'bg-zinc-950/40 border-zinc-850 text-zinc-350 hover:bg-zinc-850/30 hover:border-zinc-800'
+                      : 'bg-zinc-100 border-zinc-200 text-zinc-600 hover:bg-zinc-150 hover:border-zinc-300'
                 }`}
               >
                 {/* Method tag */}
@@ -96,17 +111,19 @@ export const SavedRequests: React.FC = () => {
 
                 {/* Content body */}
                 <div className="flex-1 min-w-0 flex flex-col justify-center">
-                  <span className="text-2xs font-semibold truncate text-zinc-200">
+                  <span className={`text-2xs font-semibold truncate ${
+                    isDarkMode ? 'text-zinc-200' : 'text-zinc-800'
+                  }`}>
                     {req.name}
                   </span>
                   
                   <div className="flex items-center gap-1.5 mt-0.5 select-none">
-                    <span className="flex items-center gap-0.5 text-4xs text-zinc-600 font-mono truncate max-w-[150px]">
+                    <span className="flex items-center gap-0.5 text-4xs text-zinc-500 font-mono truncate max-w-[150px]">
                       <Link className="w-2.5 h-2.5 flex-shrink-0" />
                       {req.url}
                     </span>
-                    <span className="text-4xs text-zinc-750 font-mono">•</span>
-                    <span className="flex items-center gap-0.5 text-4xs text-zinc-650 font-mono">
+                    <span className="text-4xs text-zinc-500 font-mono">•</span>
+                    <span className="flex items-center gap-0.5 text-4xs text-zinc-500 font-mono">
                       <Calendar className="w-2.5 h-2.5 flex-shrink-0" />
                       {formatDate(req.createdAt)}
                     </span>
@@ -118,7 +135,11 @@ export const SavedRequests: React.FC = () => {
                   <button
                     type="button"
                     onClick={(e) => handleDelete(e, req.id)}
-                    className="p-1 text-zinc-650 hover:text-rose-450 hover:bg-rose-950/20 rounded transition-all"
+                    className={`p-1 rounded transition-all ${
+                      isDarkMode 
+                        ? 'text-zinc-500 hover:text-rose-400 hover:bg-rose-950/20' 
+                        : 'text-zinc-500 hover:text-rose-600 hover:bg-rose-50'
+                    }`}
                     title="Delete Request"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -127,23 +148,29 @@ export const SavedRequests: React.FC = () => {
 
                 {/* Left active line indicator */}
                 {isActive && (
-                  <div className="absolute top-1 bottom-1 left-0 w-[2.5px] bg-violet-500 rounded-r"></div>
+                  <div className={`absolute top-1 bottom-1 left-0 w-[2.5px] rounded-r ${
+                    isDarkMode ? 'bg-zinc-200' : 'bg-zinc-900'
+                  }`}></div>
                 )}
               </div>
             );
           })
         ) : savedRequests.length > 0 ? (
           // Match Empty Screen
-          <div className="py-6 text-center text-3xs text-zinc-600 italic select-none">
+          <div className="py-6 text-center text-3xs text-zinc-500 italic select-none">
             No saved requests match your search criteria.
           </div>
         ) : (
           // Total Empty Screen
-          <div className="py-8 px-4 flex flex-col items-center justify-center text-center border border-dashed border-zinc-850 rounded-lg select-none">
-            <span className="text-zinc-650 font-mono text-[9px] uppercase tracking-wider mb-1">
+          <div className={`py-8 px-4 flex flex-col items-center justify-center text-center border border-dashed rounded-lg select-none ${
+            isDarkMode ? 'border-zinc-850' : 'border-zinc-300'
+          }`}>
+            <span className="text-zinc-500 font-mono text-[9px] uppercase tracking-wider mb-1">
               Request Library Empty
             </span>
-            <p className="text-zinc-550 text-3xs font-sans max-w-[180px] leading-normal">
+            <p className={`text-3xs font-sans max-w-[180px] leading-normal ${
+              isDarkMode ? 'text-zinc-500' : 'text-zinc-600'
+            }`}>
               Compose parameters in the editor above and save them to build your request repository.
             </p>
           </div>

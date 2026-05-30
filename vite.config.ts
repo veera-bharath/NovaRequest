@@ -2,10 +2,28 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { resolve } from 'path';
+import { copyFileSync, existsSync } from 'fs';
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    {
+      name: 'copy-extension-icon',
+      closeBundle() {
+        const srcPath = resolve(__dirname, 'src/assets/novarequest.png');
+        const destPath = resolve(__dirname, 'dist/novarequest.png');
+        if (existsSync(srcPath)) {
+          try {
+            copyFileSync(srcPath, destPath);
+          } catch (err) {
+            console.error('[copy-extension-icon] Copy failed:', err);
+          }
+        }
+      }
+    }
+  ],
   build: {
     rollupOptions: {
       input: {

@@ -107,7 +107,7 @@ This produces a fully compiled, optimized `/dist` folder with the following bund
 1. Open Google Chrome and navigate to `chrome://extensions/`.
 2. Toggle the **Developer Mode** switch in the top-right corner.
 3. Click the **Load unpacked** button in the top-left.
-4. Browse and select the `/dist` directory inside the project workspace (`D:\Projects\QuickApiCall\dist`).
+4. Browse and select the `/dist` directory inside the project workspace (`D:\Projects\NovaRequest\dist`).
 5. Pin the **NovaRequest** icon to your Chrome toolbar, click it, and start testing!
 
 ---

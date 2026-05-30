@@ -10,7 +10,7 @@ interface ParamRow {
 }
 
 export const ParamsEditor: React.FC = () => {
-  const { url, setUrl } = useRequestStore();
+  const { url, setUrl, isDarkMode } = useRequestStore();
   const [params, setParams] = useState<ParamRow[]>([]);
 
   // Parse parameters from the URL string whenever it changes
@@ -115,8 +115,8 @@ export const ParamsEditor: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2.5 bg-slate-950/20 p-2 text-zinc-300">
-      <div className="flex justify-between items-center select-none">
+    <div className={`flex flex-col gap-2.5 p-2 transition-colors ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+      <div className={`flex justify-between items-center select-none border-b pb-2 ${isDarkMode ? 'border-zinc-900' : 'border-zinc-200'}`}>
         <div className="flex items-center gap-1">
           <span className="text-2xs font-bold uppercase tracking-wider text-zinc-400 font-mono">
             Query Parameters ({params.filter(p => p.key.trim()).length})
@@ -128,7 +128,11 @@ export const ParamsEditor: React.FC = () => {
         <button
           type="button"
           onClick={addRow}
-          className="flex items-center gap-1 text-2xs font-semibold text-violet-400 hover:text-violet-300 transition-colors py-0.5 px-1.5 rounded hover:bg-violet-950/30 border border-transparent hover:border-violet-900/30"
+          className={`flex items-center gap-1 text-2xs font-semibold transition-all py-0.5 px-1.5 rounded border ${
+            isDarkMode 
+              ? 'text-zinc-300 hover:text-zinc-100 hover:bg-zinc-800 border-zinc-750' 
+              : 'text-zinc-700 hover:text-zinc-955 hover:bg-zinc-100 border-zinc-300'
+          }`}
         >
           <Plus className="w-3.5 h-3.5" />
           <span>Add Parameter</span>
@@ -143,7 +147,11 @@ export const ParamsEditor: React.FC = () => {
               type="checkbox"
               checked={row.enabled}
               onChange={(e) => handleCheckboxChange(row.id, e.target.checked)}
-              className="w-3.5 h-3.5 rounded border-zinc-800 bg-zinc-950 text-violet-600 focus:ring-0 cursor-pointer accent-violet-600"
+              className={`w-3.5 h-3.5 rounded border focus:ring-0 cursor-pointer ${
+                isDarkMode 
+                  ? 'border-zinc-700 bg-zinc-950 accent-zinc-100 text-zinc-100' 
+                  : 'border-zinc-300 bg-white accent-zinc-900 text-zinc-900'
+              }`}
             />
 
             {/* Key Input */}
@@ -152,7 +160,11 @@ export const ParamsEditor: React.FC = () => {
               value={row.key}
               onChange={(e) => handleKeyChange(row.id, e.target.value)}
               placeholder="Parameter Name"
-              className="flex-1 min-w-0 h-7.5 px-2 bg-zinc-900/50 border border-zinc-800/80 rounded text-2xs font-mono text-zinc-200 placeholder-zinc-700 focus:border-violet-500/50 focus:outline-none transition-all"
+              className={`flex-1 min-w-0 h-7.5 px-2 rounded text-2xs font-mono transition-all focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/20 border ${
+                isDarkMode 
+                  ? 'bg-zinc-955/55 border-zinc-800 text-zinc-200 placeholder-zinc-700' 
+                  : 'bg-white border-zinc-300 text-zinc-800 placeholder-zinc-400'
+              }`}
               autoFocus={index === params.length - 1 && index > 0 && !row.key}
             />
 
@@ -162,14 +174,22 @@ export const ParamsEditor: React.FC = () => {
               value={row.value}
               onChange={(e) => handleValueChange(row.id, e.target.value)}
               placeholder="Value"
-              className="flex-1 min-w-0 h-7.5 px-2 bg-zinc-900/50 border border-zinc-800/80 rounded text-2xs font-mono text-zinc-200 placeholder-zinc-700 focus:border-violet-500/50 focus:outline-none transition-all"
+              className={`flex-1 min-w-0 h-7.5 px-2 rounded text-2xs font-mono transition-all focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/20 border ${
+                isDarkMode 
+                  ? 'bg-zinc-955/55 border-zinc-800 text-zinc-200 placeholder-zinc-700' 
+                  : 'bg-white border-zinc-300 text-zinc-800 placeholder-zinc-400'
+              }`}
             />
 
             {/* Delete button */}
             <button
               type="button"
               onClick={() => removeRow(row.id)}
-              className="w-7 h-7.5 flex items-center justify-center text-zinc-500 hover:text-rose-450 hover:bg-rose-950/20 rounded border border-transparent transition-all"
+              className={`w-7 h-7.5 flex items-center justify-center rounded border border-transparent transition-all ${
+                isDarkMode 
+                  ? 'text-zinc-450 hover:text-rose-450 hover:bg-rose-950/20' 
+                  : 'text-zinc-500 hover:text-rose-600 hover:bg-rose-50 hover:border-rose-100'
+              }`}
               title="Delete Parameter"
             >
               <Trash2 className="w-3.5 h-3.5" />

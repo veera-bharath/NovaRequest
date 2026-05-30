@@ -10,14 +10,14 @@
     "<all_urls>"
   ],
   "icons": {
-    "16": "icon.png",
-    "48": "icon.png",
-    "128": "icon.png"
+    "16": "novarequest.png",
+    "48": "novarequest.png",
+    "128": "novarequest.png"
   },
   "action": {
     "default_popup": "index.html",
     "default_title": "NovaRequest",
-    "default_icon": "icon.png"
+    "default_icon": "novarequest.png"
   },
   "background": {
     "service_worker": "background.js",
