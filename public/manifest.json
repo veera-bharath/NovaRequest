@@ -9,9 +9,13 @@
   "host_permissions": [
     "<all_urls>"
   ],
+  "icons": {
+    "128": "icon.png"
+  },
   "action": {
     "default_popup": "index.html",
-    "default_title": "NovaRequest"
+    "default_title": "NovaRequest",
+    "default_icon": "icon.png"
   },
   "background": {
     "service_worker": "background.js",
