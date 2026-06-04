@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRequestStore } from '../../store/useRequestStore';
 import type { Method } from '../../types/request';
-import { Send, ChevronDown, Check, Copy } from 'lucide-react';
+import { Send, ChevronDown, Check, Copy, X } from 'lucide-react';
 
 export const RequestBuilder: React.FC = () => {
   const {
@@ -17,7 +17,7 @@ export const RequestBuilder: React.FC = () => {
   } = useRequestStore();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [copiedCurl, setCopiedCurl] = useState(false);
+  const [copiedCurl, setCopiedCurl] = useState<'copied' | 'error' | null>(null);
 
   const handleCopyAsCurl = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -31,10 +31,11 @@ export const RequestBuilder: React.FC = () => {
       const escapedBody = body.replace(/"/g, '\\"').replace(/\n/g, '');
       curl += ` -d "${escapedBody}"`;
     }
-    navigator.clipboard.writeText(curl);
-    setCopiedCurl(true);
+    navigator.clipboard.writeText(curl)
+      .then(() => setCopiedCurl('copied'))
+      .catch(() => setCopiedCurl('error'));
     setTimeout(() => {
-      setCopiedCurl(false);
+      setCopiedCurl(null);
       setIsDropdownOpen(false);
     }, 1500);
   };
@@ -210,12 +211,14 @@ export const RequestBuilder: React.FC = () => {
                   isDarkMode ? 'hover:bg-zinc-800 text-zinc-300 hover:text-zinc-100' : 'hover:bg-zinc-100 text-zinc-700 hover:text-zinc-950'
                 }`}
               >
-                {copiedCurl ? (
+                {copiedCurl === 'copied' ? (
                   <Check className="w-3 h-3 text-emerald-500" />
+                ) : copiedCurl === 'error' ? (
+                  <X className="w-3 h-3 text-red-500" />
                 ) : (
                   <Copy className="w-3 h-3" />
                 )}
-                <span>{copiedCurl ? 'Copied cURL!' : 'Copy as cURL'}</span>
+                <span>{copiedCurl === 'copied' ? 'Copied cURL!' : copiedCurl === 'error' ? 'Copy failed' : 'Copy as cURL'}</span>
               </button>
               
               <div className={`h-[0.5px] ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`}></div>

@@ -7,7 +7,7 @@ import { SavedRequests } from './components/SavedRequests';
 import { ParamsEditor } from './components/ParamsEditor';
 import { AuthEditor } from './components/AuthEditor';
 import { useRequestStore } from '../store/useRequestStore';
-import { Sun, Moon, Copy, Settings, Layers, FolderHeart, History, Folder, Database, Sliders, Check } from 'lucide-react';
+import { Sun, Moon, Copy, Settings, Layers, FolderHeart, History, Folder, Database, Sliders, Check, X } from 'lucide-react';
 import logoIcon from '../assets/novarequest.png';
 
 export const App: React.FC = () => {
@@ -23,7 +23,7 @@ export const App: React.FC = () => {
     loadTheme
   } = useRequestStore();
 
-  const [copiedConfig, setCopiedConfig] = useState(false);
+  const [copiedConfig, setCopiedConfig] = useState<'copied' | 'error' | null>(null);
 
   const handleCopyWorkbenchConfig = () => {
     let curl = `curl -X ${method} "${url || 'https://'}"`;
@@ -39,9 +39,10 @@ export const App: React.FC = () => {
       curl += ` -d "${escapedBody}"`;
     }
     
-    navigator.clipboard.writeText(curl);
-    setCopiedConfig(true);
-    setTimeout(() => setCopiedConfig(false), 2000);
+    navigator.clipboard.writeText(curl)
+      .then(() => setCopiedConfig('copied'))
+      .catch(() => setCopiedConfig('error'));
+    setTimeout(() => setCopiedConfig(null), 2000);
   };
 
   // Navigation states
@@ -140,8 +141,10 @@ export const App: React.FC = () => {
             }`}
             title="Copy Workbench Config as cURL"
           >
-            {copiedConfig ? (
+            {copiedConfig === 'copied' ? (
               <Check className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+            ) : copiedConfig === 'error' ? (
+              <X className="w-3.5 h-3.5 text-red-500" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}

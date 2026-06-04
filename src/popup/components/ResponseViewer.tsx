@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { useRequestStore } from '../../store/useRequestStore';
-import { Copy, Check, Terminal, AlertTriangle, Search, MoreVertical, Sliders, ChevronDown } from 'lucide-react';
+import { Copy, Check, X, Terminal, AlertTriangle, Search, MoreVertical, Sliders, ChevronDown } from 'lucide-react';
 
 export const ResponseViewer: React.FC = () => {
   const { response, loading, isDarkMode } = useRequestStore();
   const [activeTab, setActiveTab] = useState<'body' | 'headers' | 'cookies' | 'timeline'>('body');
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<'copied' | 'error' | null>(null);
 
   if (loading) {
     return (
@@ -42,9 +42,10 @@ export const ResponseViewer: React.FC = () => {
   const handleCopy = () => {
     if (!data) return;
     const textToCopy = typeof data === 'object' ? JSON.stringify(data, null, 2) : String(data);
-    navigator.clipboard.writeText(textToCopy);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    navigator.clipboard.writeText(textToCopy)
+      .then(() => setCopied('copied'))
+      .catch(() => setCopied('error'));
+    setTimeout(() => setCopied(null), 2000);
   };
 
   const getResponseSize = () => {
@@ -281,8 +282,10 @@ export const ResponseViewer: React.FC = () => {
             className="p-1 hover:text-zinc-300 rounded transition-colors relative"
             title="Copy Response Data"
           >
-            {copied ? (
+            {copied === 'copied' ? (
               <Check className="w-3.5 h-3.5 text-emerald-400 animate-bounce" />
+            ) : copied === 'error' ? (
+              <X className="w-3.5 h-3.5 text-red-500" />
             ) : (
               <Copy className="w-3.5 h-3.5" />
             )}
