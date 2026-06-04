@@ -197,13 +197,35 @@ export const useRequestStore = create<RequestState>((set, get) => ({
 
     try {
       if (IS_EXTENSION) {
-        // Send request through the service worker background page
+        // Guard against the MV3 service worker being killed mid-request: if the
+        // sendMessage callback is never invoked (worker terminated before calling
+        // sendResponse), this timeout ensures loading resets after 30 s.
+        let responded = false;
+        const timeoutId = setTimeout(() => {
+          if (!responded) {
+            set({
+              loading: false,
+              response: {
+                status: 0,
+                statusText: 'Timeout',
+                headers: {},
+                data: null,
+                responseTime: 0,
+                error: 'No response from background service worker. The worker may have been terminated. Please try again.',
+              },
+            });
+          }
+        }, 30_000);
+
         chrome.runtime.sendMessage(
           {
             type: 'SEND_REQUEST',
             payload: { method, url, headers, body },
           },
           (result) => {
+            responded = true;
+            clearTimeout(timeoutId);
+
             // Check for runtime error (e.g. background worker unresponsive)
             if (chrome.runtime.lastError) {
               set({
