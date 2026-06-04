@@ -5,13 +5,22 @@ import { Lock, HelpCircle } from 'lucide-react';
 export const AuthEditor: React.FC = () => {
   const { headers, setHeaders, isDarkMode } = useRequestStore();
   const [token, setToken] = useState('');
+  const [isNonBearerAuth, setIsNonBearerAuth] = useState(false);
 
-  // Extract the token if there's already an Authorization Bearer header
+  // Sync local token state from headers; detect non-Bearer Authorization headers
+  // to prevent silently overwriting credentials set in the Headers tab.
   useEffect(() => {
     const authHeader = headers.find(h => h.key.toLowerCase() === 'authorization');
     if (authHeader && authHeader.value.startsWith('Bearer ')) {
+      setIsNonBearerAuth(false);
       setToken(authHeader.value.substring(7));
     } else if (!authHeader) {
+      setIsNonBearerAuth(false);
+      setToken('');
+    } else {
+      // Non-Bearer Authorization header (e.g. Basic, ApiKey) — clear token and
+      // lock the input so the existing credentials are never silently overwritten.
+      setIsNonBearerAuth(true);
       setToken('');
     }
   }, [headers]);
@@ -72,6 +81,19 @@ export const AuthEditor: React.FC = () => {
         </span>
       </div>
 
+      {isNonBearerAuth && (
+        <div className={`flex items-start gap-1.5 px-2.5 py-2 rounded-lg text-[9px] font-sans leading-relaxed border ${
+          isDarkMode
+            ? 'bg-zinc-900/60 border-zinc-700 text-zinc-400'
+            : 'bg-zinc-100 border-zinc-300 text-zinc-600'
+        }`}>
+          <span className="mt-px shrink-0">⚠</span>
+          <span>
+            A non-Bearer <code className={`px-0.5 rounded ${isDarkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-200 text-zinc-700'}`}>Authorization</code> header is already set in the Headers tab. Edit it there to avoid overwriting your credentials.
+          </span>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1.5 mt-1">
         <label className="text-[10px] text-zinc-500 font-mono font-semibold uppercase tracking-wider">
           Token
@@ -82,10 +104,15 @@ export const AuthEditor: React.FC = () => {
             value={token}
             onChange={(e) => handleTokenChange(e.target.value)}
             placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            disabled={isNonBearerAuth}
             className={`w-full h-8 px-3 rounded-lg text-2xs font-mono transition-all focus:outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500/20 border ${
-              isDarkMode 
-                ? 'bg-zinc-950/55 border-zinc-800 text-zinc-100 placeholder-zinc-700' 
-                : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'
+              isNonBearerAuth
+                ? isDarkMode
+                  ? 'bg-zinc-900/40 border-zinc-800 text-zinc-600 cursor-not-allowed'
+                  : 'bg-zinc-100 border-zinc-300 text-zinc-400 cursor-not-allowed'
+                : isDarkMode
+                  ? 'bg-zinc-950/55 border-zinc-800 text-zinc-100 placeholder-zinc-700'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder-zinc-400'
             }`}
             spellCheck={false}
           />
