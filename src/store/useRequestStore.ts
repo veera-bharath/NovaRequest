@@ -136,7 +136,7 @@ export const useRequestStore = create<RequestState>((set, get) => ({
     // Filter out blank header templates before saving, but keep in UI
     const filteredHeaders = headers.filter((h) => h.key.trim() !== '');
 
-    const updated = await storageService.saveRequest({
+    const { saved, all } = await storageService.saveRequest({
       id: activeSavedRequestId || undefined,
       name,
       method,
@@ -145,12 +145,9 @@ export const useRequestStore = create<RequestState>((set, get) => ({
       body,
     });
 
-    // Find the saved request to get its ID if it was newly created
-    const savedRequest = updated.find((r) => r.name === name);
-
     set({
-      savedRequests: updated,
-      activeSavedRequestId: savedRequest ? savedRequest.id : activeSavedRequestId,
+      savedRequests: all,
+      activeSavedRequestId: saved.id,
     });
   },
 
