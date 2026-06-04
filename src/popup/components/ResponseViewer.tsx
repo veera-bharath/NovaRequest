@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useRequestStore } from '../../store/useRequestStore';
 import { Copy, Check, X, Terminal, AlertTriangle, Search, MoreVertical, Sliders, ChevronDown } from 'lucide-react';
 
@@ -6,6 +6,15 @@ export const ResponseViewer: React.FC = () => {
   const { response, loading, isDarkMode } = useRequestStore();
   const [activeTab, setActiveTab] = useState<'body' | 'headers' | 'cookies' | 'timeline'>('body');
   const [copied, setCopied] = useState<'copied' | 'error' | null>(null);
+
+  const minimapWidths = useMemo(() => {
+    const d = response?.data;
+    const str = d !== null && d !== undefined
+      ? (typeof d === 'object' ? JSON.stringify(d, null, 2) : String(d))
+      : '';
+    const lineCount = Math.min(str.split('\n').length, 15);
+    return Array.from({ length: lineCount }, () => Math.floor(Math.random() * 8) + 4);
+  }, [response?.data]);
 
   if (loading) {
     return (
@@ -158,16 +167,13 @@ export const ResponseViewer: React.FC = () => {
         <div className={`w-5 border-l select-none pointer-events-none py-2 flex flex-col items-center gap-0.5 opacity-40 hover:opacity-75 transition-opacity shrink-0 ${
           isDarkMode ? 'border-zinc-850 bg-zinc-950' : 'border-zinc-200 bg-zinc-50'
         }`}>
-          {lines.slice(0, 15).map((_, i) => {
-            const randomWidth = Math.floor(Math.random() * 8) + 4;
-            return (
-              <div
-                key={i}
-                className={`h-[2px] rounded-sm ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-300'}`}
-                style={{ width: `${randomWidth}px` }}
-              ></div>
-            );
-          })}
+          {minimapWidths.map((w, i) => (
+            <div
+              key={i}
+              className={`h-[2px] rounded-sm ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-300'}`}
+              style={{ width: `${w}px` }}
+            ></div>
+          ))}
         </div>
       </div>
     );
