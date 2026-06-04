@@ -28,38 +28,38 @@ export const storageService = {
    */
   saveRequest: async (
     request: Omit<SavedRequest, 'id' | 'createdAt'> & { id?: string }
-  ): Promise<SavedRequest[]> => {
+  ): Promise<{ saved: SavedRequest; all: SavedRequest[] }> => {
     const current = await storageService.getRequests();
     const now = Date.now();
     const id = request.id || Math.random().toString(36).substring(2, 9);
 
-    const newRequest: SavedRequest = {
+    const saved: SavedRequest = {
       ...request,
       id,
       createdAt: now,
     };
 
     const existingIndex = current.findIndex((r) => r.id === id);
-    let updated: SavedRequest[];
+    let all: SavedRequest[];
 
     if (existingIndex >= 0) {
-      updated = [...current];
-      updated[existingIndex] = newRequest;
+      all = [...current];
+      all[existingIndex] = saved;
     } else {
-      updated = [newRequest, ...current];
+      all = [saved, ...current];
     }
 
     if (IS_EXTENSION) {
       await new Promise<void>((resolve) => {
-        chrome.storage.local.set({ savedRequests: updated }, () => {
+        chrome.storage.local.set({ savedRequests: all }, () => {
           resolve();
         });
       });
     } else {
-      localStorage.setItem('savedRequests', JSON.stringify(updated));
+      localStorage.setItem('savedRequests', JSON.stringify(all));
     }
 
-    return updated;
+    return { saved, all };
   },
 
   /**
