@@ -33,13 +33,14 @@ export const storageService = {
     const now = Date.now();
     const id = request.id || Math.random().toString(36).substring(2, 9);
 
+    const existingIndex = current.findIndex((r) => r.id === id);
+
     const saved: SavedRequest = {
       ...request,
       id,
-      createdAt: now,
+      createdAt: existingIndex >= 0 ? current[existingIndex].createdAt : now,
     };
 
-    const existingIndex = current.findIndex((r) => r.id === id);
     let all: SavedRequest[];
 
     if (existingIndex >= 0) {
