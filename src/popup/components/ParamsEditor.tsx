@@ -42,11 +42,11 @@ export const ParamsEditor: React.FC = () => {
         newParams.push({ id: '1', key: '', value: '', enabled: true });
       }
       
-      // Update state if different to prevent infinite loops
+      // Update state only if the parsed params actually differ from current state
       const currentKeys = params.map(p => p.key + '=' + p.value).join('&');
       const incomingKeys = newParams.map(p => p.key + '=' + p.value).join('&');
-      
-      if (currentKeys !== incomingKeys && !params.some(p => !p.key && !p.value)) {
+
+      if (currentKeys !== incomingKeys) {
         setParams(newParams);
       }
     } catch (e) {
